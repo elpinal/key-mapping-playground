@@ -16,8 +16,8 @@ data Mapping = Mapping [Alphabet] [Alphabet]
 type Mappings = Map.Map [Alphabet] [Alphabet]
 
 -- Note: Don't use empty list for keys.
-commandMappings :: Map.Map [Alphabet] Command
-commandMappings = Map.fromList
+normalMappings :: Map.Map [Alphabet] Command
+normalMappings = Map.fromList
                   [ ([Alphabet 'h'], Command "moveToLeft")
                   , ([Alphabet 'j'], Command "moveDown")
                   , ([Alphabet 'k'], Command "moveUp")
@@ -31,7 +31,7 @@ data Result = Accept Command
 
 translate :: [Alphabet] -> [Result]
 translate [] = []
-translate xs = translateN commandMappings commandMappings xs 0
+translate xs = translateN normalMappings normalMappings xs 0
 
 translateN :: Map.Map [Alphabet] Command -> Map.Map [Alphabet] Command -> [Alphabet] -> Int -> [Result]
 translateN original ps xs n =
