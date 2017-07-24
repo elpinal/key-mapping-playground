@@ -31,10 +31,10 @@ data Result = Accept Command
 
 translate :: [Alphabet] -> [Result]
 translate [] = []
-translate xs = translateN commandMappings xs 0
+translate xs = translateN commandMappings commandMappings xs 0
 
-translateN :: Map.Map [Alphabet] Command -> [Alphabet] -> Int -> [Result]
-translateN ps xs n =
+translateN :: Map.Map [Alphabet] Command -> Map.Map [Alphabet] Command -> [Alphabet] -> Int -> [Result]
+translateN original ps xs n =
   let
     xs' = drop n xs
     ps' = Map.filterWithKey (\ks _ -> fromMaybe False $ (==) <$> headMay xs' <*> ks `atMay` n) ps
@@ -43,9 +43,9 @@ translateN ps xs n =
     c = Map.lookup (take (n+1) xs) ps'
   in
     case length ps' of
-      0 -> backtrack c0 xs n commandMappings
+      0 -> backtrack c0 xs n original
       1 | isJust c -> result c : translate (tail xs')
-      _ -> if length xs == n+1 then [result c] else translateN ps' xs (n+1)
+      _ -> if length xs == n+1 then [result c] else translateN original ps' xs (n+1)
 
 backtrack :: Maybe Result -> [Alphabet] -> Int -> Map.Map [Alphabet] Command -> [Result]
 backtrack c0 xs n original = if isJust c0 then fromJust c0 : translate (drop n xs) else
