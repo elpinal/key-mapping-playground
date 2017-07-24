@@ -70,16 +70,16 @@ translate'' ps (x:xs) =
       _ -> if null (tail xs') then [result $ Map.lookup [x, head xs, head xs'] ps'] else translate''' ps' (x:xs)
 
 translate''' :: Map.Map [Alphabet] Command -> [Alphabet] -> [Result]
-translate''' ps (x:xs) =
+translate''' ps xs =
   let
-    xs' = drop 2 xs
+    xs' = drop 3 xs
     ps' = Map.filterWithKey (\(k:ks) _ -> fromMaybe False $ (==) <$> headMay xs' <*> ks `atMay` 2) ps
 
-    c4 = Map.lookup (x : take 3 xs) ps'
+    c4 = Map.lookup (take 4 xs) ps'
   in
     case length ps' of
-      0 -> maybeToList (Accept <$> Map.lookup (x : take 2 xs) ps) ++ translate xs'
-      1 | isJust c4 -> result (Map.lookup (x : take 3 xs) ps') : translate (drop 3 xs)
+      0 -> maybeToList (Accept <$> Map.lookup xs' ps) ++ translate xs'
+      1 | isJust c4 -> result (Map.lookup (tail xs') ps') : translate (tail xs')
       _ -> undefined
 
 result :: Maybe Command -> Result
