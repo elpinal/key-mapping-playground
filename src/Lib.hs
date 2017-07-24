@@ -33,54 +33,20 @@ data Result = Accept Command
 
 translate :: [Alphabet] -> [Result]
 translate [] = []
-translate (x:xs) =
+translate xs = translateN commandMappings xs 0
+
+translateN :: Map.Map [Alphabet] Command -> [Alphabet] -> Int -> [Result]
+translateN ps xs n =
   let
-    ps = Map.filterWithKey (\(k:ks) _ -> x == k) commandMappings
+    xs' = drop n xs
+    ps' = Map.filterWithKey (\ks _ -> fromMaybe False $ (==) <$> headMay xs' <*> ks `atMay` n) ps
 
-    c1 = Map.lookup [x] ps
-  in
-    case length ps of
-      0 -> maybeToList (Accept <$> Map.lookup [] ps) ++ translate xs
-      1 | isJust c1 -> result c1 : translate xs
-      _ -> if null xs then [result (Map.lookup [x] ps)] else translate' ps (x:xs)
-
-translate' :: Map.Map [Alphabet] Command -> [Alphabet] -> [Result]
-translate' ps (x:xs) =
-  let
-    ps' = Map.filterWithKey (\(k:ks) _ -> fromMaybe False $ (==) <$> headMay xs <*> headMay ks) ps
-
-    c2 = Map.lookup [x, head xs] ps'
-  in
-    case length ps' of
-      0 -> maybeToList (Accept <$> Map.lookup [x] ps) ++ translate xs
-      1 | c2 /= Nothing -> result c2 : translate (tail xs)
-      _ -> if null (tail xs) then [result (Map.lookup [x, head xs] ps')] else translate'' ps' (x:xs)
-
-translate'' :: Map.Map [Alphabet] Command -> [Alphabet] -> [Result]
-translate'' ps (x:xs) =
-  let
-    xs' = tail xs
-    ps' = Map.filterWithKey (\(k:ks) _ -> fromMaybe False $ (==) <$> headMay xs' <*> ks `atMay` 1) ps
-
-    c3 = Map.lookup [x, head xs, head xs'] ps'
-  in
-    case length ps' of
-      0 -> maybeToList (Accept <$> Map.lookup [x, head xs] ps) ++ translate xs'
-      1 | c3 /= Nothing -> result c3 : translate (tail xs')
-      _ -> if null (tail xs') then [result $ Map.lookup [x, head xs, head xs'] ps'] else translate''' ps' (x:xs)
-
-translate''' :: Map.Map [Alphabet] Command -> [Alphabet] -> [Result]
-translate''' ps xs =
-  let
-    xs' = drop 3 xs
-    ps' = Map.filterWithKey (\(k:ks) _ -> fromMaybe False $ (==) <$> headMay xs' <*> ks `atMay` 2) ps
-
-    c4 = Map.lookup (take 4 xs) ps'
+    c = Map.lookup (take (n+1) xs) ps'
   in
     case length ps' of
       0 -> maybeToList (Accept <$> Map.lookup xs' ps) ++ translate xs'
-      1 | isJust c4 -> result (Map.lookup (tail xs') ps') : translate (tail xs')
-      _ -> undefined
+      1 | isJust c -> result c : translate (tail xs')
+      _ -> if length xs == n+1 then [result c] else translateN ps' xs (n+1)
 
 result :: Maybe Command -> Result
 result (Just x) = Accept x
