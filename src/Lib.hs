@@ -36,6 +36,7 @@ normalMappings = Map.fromList
                   , ([Alphabet 'l'], Name "moveToRight")
                   , ([Alphabet 'h', Alphabet '!'], Name "h!")
                   , ([Alphabet 'h', Alphabet 'i', Alphabet '!'], Name "hi!")
+                  , ([Alphabet 'g', Alphabet 'u'], Name "toLowerCase")
                   , ([Alphabet 'i'], Enter Insert)]
 
 insertMappings :: Map.Map [Alphabet] Command

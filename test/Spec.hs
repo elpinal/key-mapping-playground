@@ -21,3 +21,6 @@ main = hspec $ do
 
     it "switches mode when given a alphabet mapping which is 'Enter x'" $ do
       translate normalMappings [Alphabet 'h', Alphabet 'i', Alphabet 'y'] `shouldBe` [Accept $ Name "moveToLeft", Accept $ Enter Insert, Accept $ Name "input 'y'"]
+
+    it "returns Pending when given incomplete alphabets" $ do
+      translate normalMappings [Alphabet 'g'] `shouldBe` [Pending]
