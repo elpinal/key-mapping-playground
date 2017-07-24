@@ -41,7 +41,7 @@ translate (x:xs) =
       1 -> (Accept $ snd (Map.findMin ps)) : translate xs
       otherwise -> if null xs then [result (Map.lookup [x] ps)] else 
                      case length ps' of
-                       0 -> maybeToList (Accept <$> Map.lookup [x] ps') ++ translate xs
+                       0 -> maybeToList (Accept <$> Map.lookup [x] ps) ++ translate xs
                        1 -> (Accept $ snd (Map.findMin ps')) : translate (tail xs)
                        otherwise -> undefined
 
