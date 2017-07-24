@@ -17,6 +17,7 @@ data Mapping = Mapping [Alphabet] [Alphabet]
 
 type Mappings = Map.Map [Alphabet] [Alphabet]
 
+-- Note: Don't use empty list for keys.
 commandMappings :: Map.Map [Alphabet] Command
 commandMappings = Map.fromList
                   [ ([Alphabet 'h'], Command "moveToLeft")
