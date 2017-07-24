@@ -44,7 +44,7 @@ translateN ps xs n =
     c = Map.lookup (take (n+1) xs) ps'
   in
     case length ps' of
-      0 -> maybeToList (Accept <$> Map.lookup xs' ps) ++ translate xs'
+      0 -> maybeToList (Accept <$> Map.lookup (take n xs) ps) ++ translate xs'
       1 | isJust c -> result c : translate (tail xs')
       _ -> if length xs == n+1 then [result c] else translateN ps' xs (n+1)
 
