@@ -18,3 +18,6 @@ main = hspec $ do
 
     it "translates sequential alphabets to a mapped command" $ do
       translate normalMappings [Alphabet 'h', Alphabet 'i', Alphabet '!'] `shouldBe` [Accept $ Name "hi!"]
+
+    it "switches mode when given a alphabet mapping which is 'Enter x'" $ do
+      translate normalMappings [Alphabet 'h', Alphabet 'i', Alphabet 'y'] `shouldBe` [Accept $ Name "moveToLeft", Accept $ Enter Insert, Accept $ Name "input 'y'"]
