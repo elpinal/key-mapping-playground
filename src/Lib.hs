@@ -4,6 +4,7 @@ module Lib
 
 import qualified Data.Map.Lazy as Map
 import Data.Maybe
+import Safe
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -22,7 +23,7 @@ commandMappings = Map.fromList
                   , ([Alphabet 'j'], Command "moveDown")
                   , ([Alphabet 'k'], Command "moveUp")
                   , ([Alphabet 'l'], Command "moveToRight")
-                  , ([Alphabet 'h', Alphabet '!'], undefined)]
+                  , ([Alphabet 'h', Alphabet '!'], Command "h!")]
 
 data Result = Accept Command
             | Pending
@@ -33,7 +34,7 @@ translate [] = []
 translate (x:xs) =
   let
     ps = Map.filterWithKey (\(k:ks) _ -> x == k) commandMappings
-    ps' = Map.filterWithKey (\(k:k1:ks) _ -> head xs == k1) ps
+    ps' = Map.filterWithKey (\(k:ks) _ -> fromMaybe False $ (==) <$> headMay xs <*> headMay ks) ps
   in
     case length ps of
       0 -> translate xs
@@ -41,7 +42,7 @@ translate (x:xs) =
       otherwise -> if null xs then [result (Map.lookup [x] ps)] else 
                      case length ps' of
                        0 -> maybeToList (Accept <$> Map.lookup [x] ps') ++ translate xs
-                       1 -> (Accept $ snd (Map.findMin ps)) : translate (tail xs)
+                       1 -> (Accept $ snd (Map.findMin ps')) : translate (tail xs)
                        otherwise -> undefined
 
 result :: Maybe Command -> Result
