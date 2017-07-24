@@ -41,10 +41,11 @@ translateN ps xs n =
     xs' = drop n xs
     ps' = Map.filterWithKey (\ks _ -> fromMaybe False $ (==) <$> headMay xs' <*> ks `atMay` n) ps
 
+    c0 = Accept <$> Map.lookup (take n xs) ps
     c = Map.lookup (take (n+1) xs) ps'
   in
     case length ps' of
-      0 -> maybeToList (Accept <$> Map.lookup (take n xs) ps) ++ translate xs'
+      0 -> if isJust c0 then fromJust c0 : translate xs' else translate (tail xs')
       1 | isJust c -> result c : translate (tail xs')
       _ -> if length xs == n+1 then [result c] else translateN ps' xs (n+1)
 
