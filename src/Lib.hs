@@ -41,10 +41,12 @@ translate (x:xs) =
     ps'' = Map.filterWithKey (\(k:ks) _ -> fromMaybe False $ (==) <$> headMay xs' <*> ks `atMay` 1) ps'
     xs'' = tail xs'
     ps''' = Map.filterWithKey (\(k:ks) _ -> fromMaybe False $ (==) <$> headMay xs'' <*> ks `atMay` 2) ps''
+
+    c1 = Map.lookup [x] ps
   in
     case length ps of
-      0 -> translate xs
-      1 -> (Accept $ snd (Map.findMin ps)) : translate xs
+      0 -> maybeToList (Accept <$> Map.lookup [] ps) ++ translate xs
+      1 | isJust c1 -> result c1 : translate xs
       _ -> if null xs then [result (Map.lookup [x] ps)] else
         let
           c2 = Map.lookup [x, head xs] ps'
