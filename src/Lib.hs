@@ -48,21 +48,21 @@ translate (x:xs) =
         let
           c2 = Map.lookup [x, head xs] ps'
         in
-                     case length ps' of
-                       0 -> maybeToList (Accept <$> Map.lookup [x] ps) ++ translate xs
-                       1 | c2 /= Nothing ->  result c2 : translate (tail xs)
-                       otherwise -> if null (tail xs) then [result (Map.lookup [x, head xs] ps')] else
-                         let
-                           c3 = Map.lookup [x, head xs, head xs'] ps''
-                         in
-                           case length ps'' of
-                             0 -> maybeToList (Accept <$> Map.lookup [x, head xs] ps') ++ translate xs'
-                             1 | c3 /= Nothing -> result c3 : translate (tail xs')
-                             otherwise -> if null (tail xs') then [result $ Map.lookup [x, head xs, head xs'] ps''] else
-                               case length ps''' of
-                               0 -> maybeToList (Accept <$> Map.lookup [x, head xs, head xs'] ps'') ++ translate xs''
-                               1 -> result (Map.lookup [x, head xs, head xs', head xs''] ps''') : translate (tail xs'')
-                               otherwise -> undefined
+          case length ps' of
+            0 -> maybeToList (Accept <$> Map.lookup [x] ps) ++ translate xs
+            1 | c2 /= Nothing ->  result c2 : translate (tail xs)
+            otherwise -> if null (tail xs) then [result (Map.lookup [x, head xs] ps')] else
+              let
+                c3 = Map.lookup [x, head xs, head xs'] ps''
+              in
+                case length ps'' of
+                  0 -> maybeToList (Accept <$> Map.lookup [x, head xs] ps') ++ translate xs'
+                  1 | c3 /= Nothing -> result c3 : translate (tail xs')
+                  otherwise -> if null (tail xs') then [result $ Map.lookup [x, head xs, head xs'] ps''] else
+                    case length ps''' of
+                      0 -> maybeToList (Accept <$> Map.lookup [x, head xs, head xs'] ps'') ++ translate xs''
+                      1 -> result (Map.lookup [x, head xs, head xs', head xs''] ps''') : translate (tail xs'')
+                      otherwise -> undefined
 
 result :: Maybe Command -> Result
 result (Just x) = Accept x
