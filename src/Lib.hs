@@ -1,6 +1,4 @@
-module Lib
-    ( someFunc
-    ) where
+module Lib where
 
 import qualified Data.Map.Lazy as Map
 import Data.Maybe
@@ -29,7 +27,7 @@ commandMappings = Map.fromList
 
 data Result = Accept Command
             | Pending
-            deriving (Show)
+            deriving (Show, Eq)
 
 translate :: [Alphabet] -> [Result]
 translate [] = []
