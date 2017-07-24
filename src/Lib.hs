@@ -9,7 +9,13 @@ someFunc = putStrLn "someFunc"
 
 newtype Alphabet = Alphabet Char deriving (Show, Eq, Ord)
 
-newtype Command = Command String deriving (Show, Eq)
+data Mode = Normal
+          | Insert
+          deriving (Show, Eq, Ord)
+
+data Command = Name String
+             | Enter Mode
+             deriving (Show, Eq)
 
 data Mapping = Mapping [Alphabet] [Alphabet]
 
@@ -18,12 +24,19 @@ type Mappings = Map.Map [Alphabet] [Alphabet]
 -- Note: Don't use empty list for keys.
 normalMappings :: Map.Map [Alphabet] Command
 normalMappings = Map.fromList
-                  [ ([Alphabet 'h'], Command "moveToLeft")
-                  , ([Alphabet 'j'], Command "moveDown")
-                  , ([Alphabet 'k'], Command "moveUp")
-                  , ([Alphabet 'l'], Command "moveToRight")
-                  , ([Alphabet 'h', Alphabet '!'], Command "h!")
-                  , ([Alphabet 'h', Alphabet 'i', Alphabet '!'], Command "hi!")]
+                  [ ([Alphabet 'h'], Name "moveToLeft")
+                  , ([Alphabet 'j'], Name "moveDown")
+                  , ([Alphabet 'k'], Name "moveUp")
+                  , ([Alphabet 'l'], Name "moveToRight")
+                  , ([Alphabet 'h', Alphabet '!'], Name "h!")
+                  , ([Alphabet 'h', Alphabet 'i', Alphabet '!'], Name "hi!")
+                  , ([Alphabet 'i'], Enter Insert)]
+
+insertMappings :: Map.Map [Alphabet] Command
+insertMappings = Map.fromList
+  [ ([Alphabet 'y'], Name "input 'y'")
+  , ([Alphabet '\ESC'], Enter Normal)
+  ]
 
 data Result = Accept Command
             | Pending
