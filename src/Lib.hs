@@ -51,7 +51,7 @@ translate (x:xs) =
         in
           case length ps' of
             0 -> maybeToList (Accept <$> Map.lookup [x] ps) ++ translate xs
-            1 | c2 /= Nothing ->  result c2 : translate (tail xs)
+            1 | c2 /= Nothing -> result c2 : translate (tail xs)
             _ -> if null (tail xs) then [result (Map.lookup [x, head xs] ps')] else
               let
                 c3 = Map.lookup [x, head xs, head xs'] ps''
