@@ -43,16 +43,16 @@ translateN ps xs n =
     c = Map.lookup (take (n+1) xs) ps'
   in
     case length ps' of
-      0 -> backtrack c0 xs' xs n commandMappings
+      0 -> backtrack c0 xs n commandMappings
       1 | isJust c -> result c : translate (tail xs')
       _ -> if length xs == n+1 then [result c] else translateN ps' xs (n+1)
 
-backtrack :: Maybe Result -> [Alphabet] -> [Alphabet] -> Int -> Map.Map [Alphabet] Command -> [Result]
-backtrack c0 xs' xs n original = if isJust c0 then fromJust c0 : translate xs' else
+backtrack :: Maybe Result -> [Alphabet] -> Int -> Map.Map [Alphabet] Command -> [Result]
+backtrack c0 xs n original = if isJust c0 then fromJust c0 : translate (drop n xs) else
   let
     c1 = Accept <$> Map.lookup (take (n-1) xs) original
   in
-    if n == 0 then translate (tail xs') else backtrack c1 (drop (n-1) xs) xs (n-1) original
+    if n == 0 then translate (tail xs) else backtrack c1 xs (n-1) original
 
 result :: Maybe Command -> Result
 result (Just x) = Accept x
