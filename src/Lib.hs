@@ -86,3 +86,11 @@ selectMappings original (Accept xs) = lastDef original $ mapMaybe select xs
   where
     select (Name _) = Nothing
     select (Enter m) = Just $ Map.findWithDefault (error $ "no such mode in mode map: " ++ show m) m modeMap
+
+mapping :: Mapping -> Synonyms -> Synonyms
+mapping (Mapping lhs rhs) xs = Map.insert lhs zs xs
+  where
+    ys = translate xs rhs
+    zs = concatMap fromAccept ys
+    fromAccept (Accept cs) = cs
+    fromAccept x = error $ "fromAccept: " ++ show x
