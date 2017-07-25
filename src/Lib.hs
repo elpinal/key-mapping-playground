@@ -21,7 +21,7 @@ data Mapping = Mapping [Alphabet] [Alphabet]
 
 type Mappings = Map.Map [Alphabet] [Alphabet]
 
-type Synonym = Map.Map [Alphabet] Command
+type Synonym = Map.Map [Alphabet] [Command]
 
 modeMap :: Map.Map Mode Synonym
 modeMap = Map.fromList
@@ -32,22 +32,22 @@ modeMap = Map.fromList
 -- Note: Don't use empty list for keys.
 normalMappings :: Synonym
 normalMappings = Map.fromList
-                  [ ([Alphabet 'h'], Name "moveToLeft")
-                  , ([Alphabet 'j'], Name "moveDown")
-                  , ([Alphabet 'k'], Name "moveUp")
-                  , ([Alphabet 'l'], Name "moveToRight")
-                  , ([Alphabet 'h', Alphabet '!'], Name "h!")
-                  , ([Alphabet 'h', Alphabet 'i', Alphabet '!'], Name "hi!")
-                  , ([Alphabet 'g', Alphabet 'u'], Name "toLowerCase")
-                  , ([Alphabet 'i'], Enter Insert)]
+                  [ ([Alphabet 'h'], [Name "moveToLeft"])
+                  , ([Alphabet 'j'], [Name "moveDown"])
+                  , ([Alphabet 'k'], [Name "moveUp"])
+                  , ([Alphabet 'l'], [Name "moveToRight"])
+                  , ([Alphabet 'h', Alphabet '!'], [Name "h!"])
+                  , ([Alphabet 'h', Alphabet 'i', Alphabet '!'], [Name "hi!"])
+                  , ([Alphabet 'g', Alphabet 'u'], [Name "toLowerCase"])
+                  , ([Alphabet 'i'], [Enter Insert])]
 
 insertMappings :: Synonym
 insertMappings = Map.fromList
-  [ ([Alphabet 'y'], Name "input 'y'")
-  , ([Alphabet '\ESC'], Enter Normal)
+  [ ([Alphabet 'y'], [Name "input 'y'"])
+  , ([Alphabet '\ESC'], [Enter Normal])
   ]
 
-data Result = Accept Command
+data Result = Accept [Command]
             | Pending
             deriving (Show, Eq)
 
@@ -76,11 +76,13 @@ backtrack c0 xs n original = if isJust c0 then fromJust c0 : translate (selectMa
   in
     if n == 0 then translate original (tail xs) else backtrack c1 xs (n-1) original
 
-result :: Maybe Command -> Result
+result :: Maybe [Command] -> Result
 result (Just x) = Accept x
 result Nothing = Pending
 
 selectMappings :: Synonym -> Result -> Synonym
-selectMappings original (Accept (Name _)) = original
-selectMappings original (Accept (Enter m)) = Map.findWithDefault (error $ "no such mode in mode map: " ++ show m) m modeMap
 selectMappings _ Pending = error "unexpected Pending"
+selectMappings original (Accept xs) = lastDef original $ mapMaybe select xs
+  where
+    select (Name _) = Nothing
+    select (Enter m) = Just $ Map.findWithDefault (error $ "no such mode in mode map: " ++ show m) m modeMap
