@@ -48,12 +48,15 @@ insertSynonyms = Map.fromList
   ]
 
 data Result = Accept [Command]
-            | Pending
+            | Pending [Alphabet]
             deriving (Show, Eq)
 
+translateWithMappings :: Synonyms -> Mappings -> [Alphabet] -> [Result]
+translateWithMappings _ _ [] = []
+translateWithMappings m ma xs = translateN m m (translateMapping ma xs) 0
+
 translate :: Synonyms -> [Alphabet] -> [Result]
-translate _ [] = []
-translate m xs = translateN m m xs 0
+translate m xs = translateWithMappings m Map.empty xs
 
 translateN :: Synonyms -> Synonyms -> [Alphabet] -> Int -> [Result]
 translateN original ps xs n =
@@ -66,8 +69,8 @@ translateN original ps xs n =
   in
     case length ps' of
       0 -> backtrack c0 xs n original
-      1 | isJust c -> result c : translate (selectMappings original $ Accept $ fromJust c) (tail xs')
-      _ -> if length xs == n+1 then [result c] else translateN original ps' xs (n+1)
+      1 | isJust c -> result c xs : translate (selectMappings original $ Accept $ fromJust c) (tail xs')
+      _ -> if length xs == n+1 then [result c xs] else translateN original ps' xs (n+1)
 
 backtrack :: Maybe Result -> [Alphabet] -> Int -> Synonyms -> [Result]
 backtrack c0 xs n original = if isJust c0 then fromJust c0 : translate (selectMappings original (fromJust c0)) (drop n xs) else
@@ -76,21 +79,43 @@ backtrack c0 xs n original = if isJust c0 then fromJust c0 : translate (selectMa
   in
     if n == 0 then translate original (tail xs) else backtrack c1 xs (n-1) original
 
-result :: Maybe [Command] -> Result
-result (Just x) = Accept x
-result Nothing = Pending
+result :: Maybe [Command] -> [Alphabet] -> Result
+result (Just x) _ = Accept x
+result Nothing xs = Pending xs
 
 selectMappings :: Synonyms -> Result -> Synonyms
-selectMappings _ Pending = error "unexpected Pending"
+selectMappings _ (Pending x) = error $ "selectMappings: " ++ show x
 selectMappings original (Accept xs) = lastDef original $ mapMaybe select xs
   where
     select (Name _) = Nothing
     select (Enter m) = Just $ Map.findWithDefault (error $ "no such mode in mode map: " ++ show m) m modeMap
 
-mapping :: Mapping -> Synonyms -> Synonyms
-mapping (Mapping lhs rhs) xs = Map.insert lhs zs xs
+mapping :: [Mapping] -> Mappings
+mapping xs = mapping' xs Map.empty
   where
-    ys = translate xs rhs
-    zs = concatMap fromAccept ys
-    fromAccept (Accept cs) = cs
-    fromAccept x = error $ "fromAccept: " ++ show x
+    mapping' [] m = m
+    mapping' ((Mapping lhs rhs):xs) m = mapping' xs $ Map.insert lhs rhs m
+
+translateMapping :: Mappings -> [Alphabet] -> [Alphabet]
+translateMapping m xs = translateMappingN m m xs 0
+
+translateMappingN :: Mappings -> Mappings -> [Alphabet] -> Int -> [Alphabet]
+translateMappingN original ma xs n =
+  let
+    xs' = drop n xs
+    ma' = Map.filterWithKey (\ks _ -> fromMaybe False $ (==) <$> headMay xs' <*> ks `atMay` n) ma
+
+    c0 = Map.lookup (take n xs) ma
+    c = Map.lookup (take (n+1) xs) ma'
+  in
+    case length ma' of
+      0 -> backtrackMapping c0 xs n original
+      1 | isJust c -> fromJust c ++ tail xs'
+      _ -> if length xs == n+1 then fromMaybe xs c else translateMappingN original ma' xs (n+1)
+
+backtrackMapping :: Maybe [Alphabet] -> [Alphabet] -> Int -> Mappings -> [Alphabet]
+backtrackMapping c0 xs n original = if isJust c0 then fromJust c0 ++ drop n xs else
+  let
+    c1 = Map.lookup (take (n-1) xs) original
+  in
+    if n == 0 then xs else backtrackMapping c1 xs (n-1) original
