@@ -24,3 +24,11 @@ main = hspec $ do
 
     it "returns Pending when given incomplete alphabets" $ do
       translate normalSynonyms [Alphabet 'g'] `shouldBe` [Pending]
+
+    it "transrates alphabets using modified mappings" $ do
+      translate (mapping (Mapping [Alphabet 'h', Alphabet 'i'] [Alphabet 'i', Alphabet 'y', Alphabet '\ESC']) normalSynonyms)
+        [Alphabet 'h', Alphabet 'i', Alphabet 'k'] `shouldBe` [Accept [Enter Insert, Name "input 'y'", Enter Normal], Accept [Name "moveUp"]]
+
+    it "transrates alphabets using modified mappings which include incomplete a command" $ do
+      translate (mapping (Mapping [Alphabet 'U', Alphabet 'U'] [Alphabet 'h', Alphabet 'i']) normalSynonyms)
+        [Alphabet 'U', Alphabet 'U', Alphabet '!'] `shouldBe` [Accept [Name "hi!"]]
