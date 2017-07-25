@@ -21,16 +21,16 @@ data Mapping = Mapping [Alphabet] [Alphabet]
 
 type Mappings = Map.Map [Alphabet] [Alphabet]
 
-type Synonym = Map.Map [Alphabet] [Command]
+type Synonyms = Map.Map [Alphabet] [Command]
 
-modeMap :: Map.Map Mode Synonym
+modeMap :: Map.Map Mode Synonyms
 modeMap = Map.fromList
   [ (Normal, normalSynonyms)
   , (Insert, insertSynonyms)
   ]
 
 -- Note: Don't use empty list for keys.
-normalSynonyms :: Synonym
+normalSynonyms :: Synonyms
 normalSynonyms = Map.fromList
                   [ ([Alphabet 'h'], [Name "moveToLeft"])
                   , ([Alphabet 'j'], [Name "moveDown"])
@@ -41,7 +41,7 @@ normalSynonyms = Map.fromList
                   , ([Alphabet 'g', Alphabet 'u'], [Name "toLowerCase"])
                   , ([Alphabet 'i'], [Enter Insert])]
 
-insertSynonyms :: Synonym
+insertSynonyms :: Synonyms
 insertSynonyms = Map.fromList
   [ ([Alphabet 'y'], [Name "input 'y'"])
   , ([Alphabet '\ESC'], [Enter Normal])
@@ -51,11 +51,11 @@ data Result = Accept [Command]
             | Pending
             deriving (Show, Eq)
 
-translate :: Synonym -> [Alphabet] -> [Result]
+translate :: Synonyms -> [Alphabet] -> [Result]
 translate _ [] = []
 translate m xs = translateN m m xs 0
 
-translateN :: Synonym -> Synonym -> [Alphabet] -> Int -> [Result]
+translateN :: Synonyms -> Synonyms -> [Alphabet] -> Int -> [Result]
 translateN original ps xs n =
   let
     xs' = drop n xs
@@ -69,7 +69,7 @@ translateN original ps xs n =
       1 | isJust c -> result c : translate (selectMappings original $ Accept $ fromJust c) (tail xs')
       _ -> if length xs == n+1 then [result c] else translateN original ps' xs (n+1)
 
-backtrack :: Maybe Result -> [Alphabet] -> Int -> Synonym -> [Result]
+backtrack :: Maybe Result -> [Alphabet] -> Int -> Synonyms -> [Result]
 backtrack c0 xs n original = if isJust c0 then fromJust c0 : translate (selectMappings original (fromJust c0)) (drop n xs) else
   let
     c1 = Accept <$> Map.lookup (take (n-1) xs) original
@@ -80,7 +80,7 @@ result :: Maybe [Command] -> Result
 result (Just x) = Accept x
 result Nothing = Pending
 
-selectMappings :: Synonym -> Result -> Synonym
+selectMappings :: Synonyms -> Result -> Synonyms
 selectMappings _ Pending = error "unexpected Pending"
 selectMappings original (Accept xs) = lastDef original $ mapMaybe select xs
   where
