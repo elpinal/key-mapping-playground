@@ -25,13 +25,13 @@ type Synonym = Map.Map [Alphabet] [Command]
 
 modeMap :: Map.Map Mode Synonym
 modeMap = Map.fromList
-  [ (Normal, normalMappings)
-  , (Insert, insertMappings)
+  [ (Normal, normalSynonyms)
+  , (Insert, insertSynonyms)
   ]
 
 -- Note: Don't use empty list for keys.
-normalMappings :: Synonym
-normalMappings = Map.fromList
+normalSynonyms :: Synonym
+normalSynonyms = Map.fromList
                   [ ([Alphabet 'h'], [Name "moveToLeft"])
                   , ([Alphabet 'j'], [Name "moveDown"])
                   , ([Alphabet 'k'], [Name "moveUp"])
@@ -41,8 +41,8 @@ normalMappings = Map.fromList
                   , ([Alphabet 'g', Alphabet 'u'], [Name "toLowerCase"])
                   , ([Alphabet 'i'], [Enter Insert])]
 
-insertMappings :: Synonym
-insertMappings = Map.fromList
+insertSynonyms :: Synonym
+insertSynonyms = Map.fromList
   [ ([Alphabet 'y'], [Name "input 'y'"])
   , ([Alphabet '\ESC'], [Enter Normal])
   ]
