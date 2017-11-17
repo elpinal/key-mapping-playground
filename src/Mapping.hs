@@ -88,6 +88,13 @@ mnemonics = map (first toAlphabet)
 data Mod a =
     Ctl a
   | NoMod a
+  deriving Eq
 
 toAlphabet :: String -> [Mod Char]
 toAlphabet = map NoMod
+
+execute :: [Mod Char] -> Maybe (Command, [Mod Char])
+execute (x : xs) =
+  case lookup [x] mnemonics of
+    Just c -> Just (c, xs)
+    Nothing -> Nothing
