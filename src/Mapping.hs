@@ -62,6 +62,7 @@ toggleVisual target (Visual form)
   | otherwise      = return $ Visual target
 toggleVisual _ _ = Nothing
 
+infixl 3 <||>
 (<||>) = liftA2 (<|>)
 
 infixl 3 <|||>
