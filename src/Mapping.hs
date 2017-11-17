@@ -64,6 +64,9 @@ toggleVisual _ _ = Nothing
 
 (<||>) = liftA2 (<|>)
 
+infixl 3 <|||>
+(<|||>) = liftA2 (<||>)
+
 iwCmd :: Command
 iwCmd = withPred isOperatorPending afterOperatorPending
 
