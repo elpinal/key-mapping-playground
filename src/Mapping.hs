@@ -1,6 +1,7 @@
 module Mapping where
 
 import Control.Applicative
+import Data.Bifunctor
 
 type Command = Mode -> Maybe Mode
 
@@ -74,8 +75,8 @@ withPred f g c =
     then g c
     else Nothing
 
-mnemonics :: [(String, Command)]
-mnemonics =
+mnemonics :: [([Mod Char], Command)]
+mnemonics = map (first toAlphabet)
   [ ("i", iCmd)
   , ("iw", iwCmd)
   , ("j", jCmd)
@@ -83,3 +84,10 @@ mnemonics =
   , ("I", iCmdC)
   , ("V", vCmdC)
   ]
+
+data Mod a =
+    Ctl a
+  | NoMod a
+
+toAlphabet :: String -> [Mod Char]
+toAlphabet = map NoMod
