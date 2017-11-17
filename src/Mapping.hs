@@ -35,10 +35,7 @@ iwCmd :: Command
 iwCmd = withPred isOperatorPending afterOperatorPending
 
 within :: Mode -> Mode -> Command
-within m n c =
-  if c == m
-    then return n
-    else Nothing
+within m n = withPred (== m) . const $ return n
 
 withPred :: (Mode -> Bool) -> (Mode -> Maybe Mode) -> Command
 withPred f g c =
