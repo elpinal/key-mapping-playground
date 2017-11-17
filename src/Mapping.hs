@@ -6,14 +6,27 @@ type Command = Mode -> Maybe Mode
 
 data Mode =
     Normal
-  | Visual
+  | Visual Form
   | Insert
   | OperatorPending Mode
   deriving Eq
 
+data Form =
+    Block
+  | Line
+  | Character
+  deriving Eq
+
+enter :: Mode -> Mode -> Maybe Mode
+enter = pure . return
+
 isOperatorPending :: Mode -> Bool
 isOperatorPending (OperatorPending _) = True
 isOperatorPending _ = False
+
+isVisual :: Mode -> Bool
+isVisual (Visual _) = True
+isVisual _ = False
 
 afterOperatorPending :: Mode -> Maybe Mode
 afterOperatorPending (OperatorPending m) = return m
@@ -27,7 +40,7 @@ jCmd = within Normal Normal
 
 -- The suffix 'C' means 'capital', so iCmdC means 'capital "i" command' ("I" command).
 iCmdC :: Command
-iCmdC = within Normal Insert <||> within Visual Insert
+iCmdC = within Normal Insert <||> withPred isVisual (enter Insert)
 
 (<||>) = liftA2 (<|>)
 
