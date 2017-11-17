@@ -45,7 +45,7 @@ iCmdC :: Command
 iCmdC = within Normal Insert <||> withPred isVisual (enter Insert)
 
 vFamily :: Form -> Command
-vFamily f = within Normal (Visual f) <||> withPred isVisual (toggleVisual f)
+vFamily = within Normal . Visual <|||> withPred isVisual . toggleVisual
 
 vCmd :: Command
 vCmd = vFamily Character
