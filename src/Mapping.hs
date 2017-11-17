@@ -73,3 +73,13 @@ withPred f g c =
   if f c
     then g c
     else Nothing
+
+mnemonics :: [(String, Command)]
+mnemonics =
+  [ ("i", iCmd)
+  , ("iw", iwCmd)
+  , ("j", jCmd)
+  , ("v", vCmd)
+  , ("I", iCmdC)
+  , ("V", vCmdC)
+  ]
