@@ -42,6 +42,15 @@ jCmd = within Normal Normal
 iCmdC :: Command
 iCmdC = within Normal Insert <||> withPred isVisual (enter Insert)
 
+vCmd :: Command
+vCmd = within Normal (Visual Character) <||> withPred isVisual (toggleVisual Character)
+
+toggleVisual :: Form -> Mode -> Maybe Mode
+toggleVisual target (Visual form)
+  | form == target = return Normal
+  | otherwise      = return $ Visual target
+toggleVisual _ _ = Nothing
+
 (<||>) = liftA2 (<|>)
 
 iwCmd :: Command
