@@ -42,8 +42,17 @@ jCmd = within Normal Normal
 iCmdC :: Command
 iCmdC = within Normal Insert <||> withPred isVisual (enter Insert)
 
+vFamily :: Form -> Command
+vFamily f = within Normal (Visual f) <||> withPred isVisual (toggleVisual f)
+
 vCmd :: Command
-vCmd = within Normal (Visual Character) <||> withPred isVisual (toggleVisual Character)
+vCmd = vFamily Character
+
+vCmdC :: Command
+vCmdC = vFamily Line
+
+vCmdCtl :: Command
+vCmdCtl = vFamily Block
 
 toggleVisual :: Form -> Mode -> Maybe Mode
 toggleVisual target (Visual form)
