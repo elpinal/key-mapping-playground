@@ -2,6 +2,7 @@ module Mapping where
 
 import Control.Applicative
 import Data.Bifunctor
+import qualified Data.Map.Lazy as Map
 
 type Command = Mode -> Maybe Mode
 
@@ -75,8 +76,8 @@ withPred f g c =
     then g c
     else Nothing
 
-mnemonics :: [([Mod Char], Command)]
-mnemonics = map (first toAlphabet)
+mnemonics :: Map.Map [Mod Char] Command
+mnemonics = Map.fromList $ map (first toAlphabet)
   [ ("i", iCmd)
   , ("iw", iwCmd)
   , ("j", jCmd)
@@ -88,13 +89,13 @@ mnemonics = map (first toAlphabet)
 data Mod a =
     Ctl a
   | NoMod a
-  deriving Eq
+  deriving (Eq, Ord)
 
 toAlphabet :: String -> [Mod Char]
 toAlphabet = map NoMod
 
 execute :: [Mod Char] -> Maybe (Command, [Mod Char])
 execute (x : xs) =
-  case lookup [x] mnemonics of
+  case Map.lookup [x] mnemonics of
     Just c -> Just (c, xs)
     Nothing -> Nothing
