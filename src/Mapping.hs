@@ -83,7 +83,7 @@ mnemonics = map (first toAlphabet)
   , ("v", vCmd)
   , ("I", iCmdC)
   , ("V", vCmdC)
-  ]
+  ] ++ [([Ctl 'v'], vCmdCtl)]
 
 data Mod a =
     Ctl a
