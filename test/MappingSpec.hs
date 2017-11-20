@@ -39,8 +39,8 @@ spec = do
       execFromNormal []                     (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert) `shouldBe` (Nothing, [])
       execFromNormal [NoMod 'a']            (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert) `shouldBe` (Just (Just Insert), [])
       execFromNormal [NoMod 'a', NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert) `shouldBe` (Just (Just Insert), [NoMod 'a'])
-      execFromNormal [NoMod 'a', NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Nothing)     `shouldBe` (Just Nothing, [NoMod 'a'])
-      execFromNormal [NoMod 'z']            (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Nothing)     `shouldBe` (Nothing, [NoMod 'z'])
+      execFromNormal [NoMod 'a', NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] $ const Nothing)       `shouldBe` (Just Nothing, [NoMod 'a'])
+      execFromNormal [NoMod 'z']            (buildCommands $ Map.singleton [NoMod 'a'] $ const Nothing)       `shouldBe` (Nothing, [NoMod 'z'])
 
       execFromNormal [NoMod 'a']            (buildCommands $ Map.singleton [NoMod 'a', NoMod 'b'] $ const $ Just Insert) `shouldBe` (Nothing, [NoMod 'a'])
       execFromNormal [NoMod 'a', NoMod 'b'] (buildCommands $ Map.singleton [NoMod 'a', NoMod 'b'] $ const $ Just Insert) `shouldBe` (Just (Just Insert), [])
