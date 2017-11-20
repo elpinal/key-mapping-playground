@@ -125,18 +125,19 @@ exampleF = K Nothing f
     g c = Z Nothing
 
 buildCommands :: Map.Map [Mod Char] Command -> F (Mod Char) Command
-buildCommands m = K Nothing f
+buildCommands = K Nothing . f
   where
-    f :: Mod Char -> F (Mod Char) Command
-    f mc =
+    f :: Map.Map [Mod Char] Command -> Mod Char -> F (Mod Char) Command
+    f m mc =
       let
-        m' = Map.filterWithKey (\k a -> mc `isPrefixOf` k) m
+        m' = Map.filterWithKey (\k a -> Just mc == k `atMay` 0) m
       in
-        K (Map.lookup [mc] m') f
+        K (Map.lookup [mc] m') . f $ Map.mapKeys tail m'
 
-isPrefixOf :: Eq a => a -> [a] -> Bool
-isPrefixOf x (y : ys) | x == y = True
-isPrefixOf _ _ = False
+atMay :: [a] -> Int -> Maybe a
+atMay (x : xs) 0 = Just x
+atMay (x : xs) n = atMay xs $ n - 1
+atMay [] n = Nothing
 
 execute :: [Mod Char] -> Maybe (Command, [Mod Char])
 execute (x : xs) =
