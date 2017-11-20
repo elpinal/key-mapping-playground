@@ -98,6 +98,32 @@ data Mod a =
 toAlphabet :: String -> [Mod Char]
 toAlphabet = map NoMod
 
+data F a b =
+    K (Maybe b) (a -> F a b)
+  | Z (Maybe b) -- might not be needed? overlapped with K?
+
+lookupF :: [a] -> F a b -> (Maybe b, [a])
+lookupF xs (Z y) = (y, xs)
+lookupF (x : xs) (K def f) = case lookupF xs $ f x of
+  a @ (Just _, _) -> a
+  (Nothing, vs) -> (def, x : vs)
+lookupF [] (K def f) = (def, [])
+
+exampleF :: F Char Int
+exampleF = K Nothing f
+  where
+    f :: Char -> F Char Int
+    f 'a' = Z $ Just 3
+    f 'b' = Z $ Just 5
+    f 'c' = K Nothing f
+    f 'd' = K (Just 99) g
+    f c = Z Nothing
+
+    g :: Char -> F Char Int
+    g 's' = Z $ Just 22
+    g 't' = K Nothing f
+    g c = Z Nothing
+
 execute :: [Mod Char] -> Maybe (Command, [Mod Char])
 execute (x : xs) =
   case Map.lookup [x] mnemonics of
