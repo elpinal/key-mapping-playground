@@ -44,3 +44,5 @@ spec = do
 
       execFromNormal [NoMod 'a']            (buildCommands $ Map.singleton [NoMod 'a', NoMod 'b'] $ const $ Just Insert) `shouldBe` (Nothing, [NoMod 'a'])
       execFromNormal [NoMod 'a', NoMod 'b'] (buildCommands $ Map.singleton [NoMod 'a', NoMod 'b'] $ const $ Just Insert) `shouldBe` (Just (Just Insert), [])
+
+      execFromNormal [NoMod 'a', NoMod 'b'] (buildCommands $ Map.fromList [([NoMod 'a'], const $ Just Normal), ([NoMod 'a', NoMod 'b'], const $ Just Insert)]) `shouldBe` (Just (Just Insert), [])
