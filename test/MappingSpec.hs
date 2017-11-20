@@ -32,7 +32,10 @@ spec = do
 
   describe "buildCommands" $
     it "builds a map of commands into a recursive function" $ do
-      first (fmap (return Normal >>=)) (lookupF [] (buildCommands Map.empty)) `shouldBe` (Nothing, [])
-      first (fmap (return Normal >>=)) (lookupF [] (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert)) `shouldBe` (Nothing, [])
-      first (fmap (return Normal >>=)) (lookupF [NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert)) `shouldBe` (Just (Just Insert), [])
-      first (fmap (return Normal >>=)) (lookupF [NoMod 'a', NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert)) `shouldBe` (Just (Just Insert), [NoMod 'a'])
+      let fromNormal = first $ fmap (return Normal >>=)
+      let execFromNormal a = fromNormal . lookupF a
+
+      execFromNormal []                     (buildCommands Map.empty)                                         `shouldBe` (Nothing, [])
+      execFromNormal []                     (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert) `shouldBe` (Nothing, [])
+      execFromNormal [NoMod 'a']            (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert) `shouldBe` (Just (Just Insert), [])
+      execFromNormal [NoMod 'a', NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert) `shouldBe` (Just (Just Insert), [NoMod 'a'])
