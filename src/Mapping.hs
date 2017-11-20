@@ -11,13 +11,13 @@ data Mode =
   | Visual Form
   | Insert
   | OperatorPending Mode
-  deriving Eq
+  deriving (Eq, Show)
 
 data Form =
     Block
   | Line
   | Character
-  deriving Eq
+  deriving (Eq, Show)
 
 enter :: Mode -> Mode -> Maybe Mode
 enter = pure . return
@@ -93,7 +93,7 @@ mnemonics = Map.fromList $ map (first toAlphabet)
 data Mod a =
     Ctl a
   | NoMod a
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Show)
 
 toAlphabet :: String -> [Mod Char]
 toAlphabet = map NoMod
