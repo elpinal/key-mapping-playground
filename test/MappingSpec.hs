@@ -2,10 +2,13 @@ module MappingSpec where
 
 import Test.Hspec
 
+import Control.Arrow
+import qualified Data.Map.Lazy as Map
+
 import Mapping
 
 spec :: Spec
-spec =
+spec = do
   describe "lookupF" $
     it "looks up" $ do
       lookupF ['a'] exampleF `shouldBe` (Just 3, [])
@@ -26,3 +29,10 @@ spec =
       lookupF ['d', 'z'] exampleF `shouldBe` (Just 99, ['z'])
 
       lookupF ['d', 't', 'd'] exampleF `shouldBe` (Just 99, [])
+
+  describe "buildCommands" $
+    it "builds a map of commands into a recursive function" $ do
+      first (fmap (return Normal >>=)) (lookupF [] (buildCommands Map.empty)) `shouldBe` (Nothing, [])
+      first (fmap (return Normal >>=)) (lookupF [] (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert)) `shouldBe` (Nothing, [])
+      first (fmap (return Normal >>=)) (lookupF [NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert)) `shouldBe` (Just (Just Insert), [])
+      first (fmap (return Normal >>=)) (lookupF [NoMod 'a', NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert)) `shouldBe` (Just (Just Insert), [NoMod 'a'])
