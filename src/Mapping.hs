@@ -124,6 +124,20 @@ exampleF = K Nothing f
     g 't' = K Nothing f
     g c = Z Nothing
 
+buildCommands :: Map.Map [Mod Char] Command -> F (Mod Char) Command
+buildCommands m = K Nothing f
+  where
+    f :: Mod Char -> F (Mod Char) Command
+    f mc =
+      let
+        m' = Map.filterWithKey (\k a -> mc `isPrefixOf` k) m
+      in
+        K (Map.lookup [mc] m') f
+
+isPrefixOf :: Eq a => a -> [a] -> Bool
+isPrefixOf x (y : ys) | x == y = True
+isPrefixOf _ _ = False
+
 execute :: [Mod Char] -> Maybe (Command, [Mod Char])
 execute (x : xs) =
   case Map.lookup [x] mnemonics of
