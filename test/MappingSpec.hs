@@ -33,16 +33,19 @@ spec = do
   describe "buildCommands" $
     it "builds a map of commands into a recursive function" $ do
       let fromNormal = first $ fmap (return Normal >>=)
-      let execFromNormal a = fromNormal . lookupF a
+          execFromNormal a = fromNormal . lookupF a
+          enterInsert = const $ Just Insert
+          enterNormal = const $ Just Normal
+          alwaysUndef = const Nothing
 
-      execFromNormal []                     (buildCommands Map.empty)                                         `shouldBe` (Nothing, [])
-      execFromNormal []                     (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert) `shouldBe` (Nothing, [])
-      execFromNormal [NoMod 'a']            (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert) `shouldBe` (Just (Just Insert), [])
-      execFromNormal [NoMod 'a', NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] $ const $ Just Insert) `shouldBe` (Just (Just Insert), [NoMod 'a'])
-      execFromNormal [NoMod 'a', NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] $ const Nothing)       `shouldBe` (Just Nothing, [NoMod 'a'])
-      execFromNormal [NoMod 'z']            (buildCommands $ Map.singleton [NoMod 'a'] $ const Nothing)       `shouldBe` (Nothing, [NoMod 'z'])
+      execFromNormal []                     (buildCommands Map.empty)                               `shouldBe` (Nothing, [])
+      execFromNormal []                     (buildCommands $ Map.singleton [NoMod 'a'] enterInsert) `shouldBe` (Nothing, [])
+      execFromNormal [NoMod 'a']            (buildCommands $ Map.singleton [NoMod 'a'] enterInsert) `shouldBe` (Just (Just Insert), [])
+      execFromNormal [NoMod 'a', NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] enterInsert) `shouldBe` (Just (Just Insert), [NoMod 'a'])
+      execFromNormal [NoMod 'a', NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] alwaysUndef) `shouldBe` (Just Nothing, [NoMod 'a'])
+      execFromNormal [NoMod 'z']            (buildCommands $ Map.singleton [NoMod 'a'] alwaysUndef) `shouldBe` (Nothing, [NoMod 'z'])
 
-      execFromNormal [NoMod 'a']            (buildCommands $ Map.singleton [NoMod 'a', NoMod 'b'] $ const $ Just Insert) `shouldBe` (Nothing, [NoMod 'a'])
-      execFromNormal [NoMod 'a', NoMod 'b'] (buildCommands $ Map.singleton [NoMod 'a', NoMod 'b'] $ const $ Just Insert) `shouldBe` (Just (Just Insert), [])
+      execFromNormal [NoMod 'a']            (buildCommands $ Map.singleton [NoMod 'a', NoMod 'b'] enterInsert) `shouldBe` (Nothing, [NoMod 'a'])
+      execFromNormal [NoMod 'a', NoMod 'b'] (buildCommands $ Map.singleton [NoMod 'a', NoMod 'b'] enterInsert) `shouldBe` (Just (Just Insert), [])
 
-      execFromNormal [NoMod 'a', NoMod 'b'] (buildCommands $ Map.fromList [([NoMod 'a'], const $ Just Normal), ([NoMod 'a', NoMod 'b'], const $ Just Insert)]) `shouldBe` (Just (Just Insert), [])
+      execFromNormal [NoMod 'a', NoMod 'b'] (buildCommands $ Map.fromList [([NoMod 'a'], enterNormal), ([NoMod 'a', NoMod 'b'], enterInsert)]) `shouldBe` (Just (Just Insert), [])
