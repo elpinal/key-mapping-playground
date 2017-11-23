@@ -140,3 +140,8 @@ headMay [] = Nothing
 
 execute :: [Mod Char] -> (Maybe Command, [Mod Char])
 execute xs = lookupF xs $ buildCommands mnemonics
+
+executeAll :: [Mod Char] -> ([Command], [Mod Char])
+executeAll xs = case execute xs of
+  (Just c, ys) -> first (c :) $ executeAll ys
+  (Nothing, ys) -> ([], ys)
