@@ -155,3 +155,7 @@ type EnvTransformer = Env -> Env
 
 translate :: Mod Char -> Mod Char -> EnvTransformer
 translate s d e = e { transMap = Map.insert s d $ transMap e }
+
+seqCmd :: [Command] -> Command
+seqCmd (c : cs) m = c m >>= seqCmd cs
+seqCmd [] m = return m
