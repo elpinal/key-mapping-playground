@@ -138,8 +138,5 @@ headMay :: [a] -> Maybe a
 headMay (x : xs) = Just x
 headMay [] = Nothing
 
-execute :: [Mod Char] -> Maybe (Command, [Mod Char])
-execute (x : xs) =
-  case Map.lookup [x] mnemonics of
-    Just c -> Just (c, xs)
-    Nothing -> Nothing
+execute :: [Mod Char] -> (Maybe Command, [Mod Char])
+execute xs = lookupF xs $ buildCommands mnemonics
