@@ -149,3 +149,6 @@ executeAll xs = case execute xs of
 type Env = Map.Map (Mod Char) (Mod Char)
 
 type EnvTransformer = Env -> Env
+
+translate :: Mod Char -> Mod Char -> EnvTransformer
+translate s d = Map.insert s d
