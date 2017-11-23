@@ -146,9 +146,9 @@ executeAll xs = case execute xs of
   (Just c, ys) -> first (c :) $ executeAll ys
   (Nothing, ys) -> ([], ys)
 
-type Env = Map.Map (Mod Char) (Mod Char)
+data Env = Env { transMap :: Map.Map (Mod Char) (Mod Char) }
 
 type EnvTransformer = Env -> Env
 
 translate :: Mod Char -> Mod Char -> EnvTransformer
-translate s d = Map.insert s d
+translate s d = Env . Map.insert s d . transMap
