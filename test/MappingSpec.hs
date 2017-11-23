@@ -33,10 +33,14 @@ spec = do
   describe "buildCommands" $
     it "builds a map of commands into a recursive function" $ do
       let fromNormal = first $ fmap (return Normal >>=)
+          fromInsert = first $ fmap (return Insert >>=)
           execFromNormal a = fromNormal . lookupF a
+          execFromInsert a = fromInsert . lookupF a
           enterInsert = const $ Just Insert
           enterNormal = const $ Just Normal
           alwaysUndef = const Nothing
+          switchNormIns Normal = Just Insert
+          switchNormIns Insert = Just Normal
 
       execFromNormal []                     (buildCommands Map.empty)                               `shouldBe` (Nothing, [])
       execFromNormal []                     (buildCommands $ Map.singleton [NoMod 'a'] enterInsert) `shouldBe` (Nothing, [])
@@ -48,4 +52,8 @@ spec = do
       execFromNormal [NoMod 'a']            (buildCommands $ Map.singleton [NoMod 'a', NoMod 'b'] enterInsert) `shouldBe` (Nothing, [NoMod 'a'])
       execFromNormal [NoMod 'a', NoMod 'b'] (buildCommands $ Map.singleton [NoMod 'a', NoMod 'b'] enterInsert) `shouldBe` (Just (Just Insert), [])
 
+      execFromNormal [NoMod 'a']            (buildCommands $ Map.fromList [([NoMod 'a'], enterNormal), ([NoMod 'a', NoMod 'b'], enterInsert)]) `shouldBe` (Just (Just Normal), [])
       execFromNormal [NoMod 'a', NoMod 'b'] (buildCommands $ Map.fromList [([NoMod 'a'], enterNormal), ([NoMod 'a', NoMod 'b'], enterInsert)]) `shouldBe` (Just (Just Insert), [])
+
+      execFromNormal [NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] switchNormIns) `shouldBe` (Just (Just Insert), [])
+      execFromInsert [NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] switchNormIns) `shouldBe` (Just (Just Normal), [])
