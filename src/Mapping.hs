@@ -145,3 +145,7 @@ executeAll :: [Mod Char] -> ([Command], [Mod Char])
 executeAll xs = case execute xs of
   (Just c, ys) -> first (c :) $ executeAll ys
   (Nothing, ys) -> ([], ys)
+
+type Env = Map.Map (Mod Char) (Mod Char)
+
+type EnvTransformer = Env -> Env
