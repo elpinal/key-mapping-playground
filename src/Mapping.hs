@@ -130,7 +130,7 @@ buildCommands = K Nothing . f
     f :: Map.Map [Mod Char] Command -> Mod Char -> F (Mod Char) Command
     f m mc =
       let
-        m' = Map.filterWithKey (\k a -> Just mc == headMay k) m
+        m' = Map.filterWithKey (\k _ -> Just mc == headMay k) m
       in
         K (Map.lookup [mc] m') . f $ Map.mapKeys tail m'
 
