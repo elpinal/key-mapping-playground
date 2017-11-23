@@ -109,21 +109,6 @@ lookupF (x : xs) (K def f) = case lookupF xs $ f x of
   (Nothing, vs) -> (def, x : vs)
 lookupF [] (K def f) = (def, [])
 
-exampleF :: F Char Int
-exampleF = K Nothing f
-  where
-    f :: Char -> F Char Int
-    f 'a' = Z $ Just 3
-    f 'b' = Z $ Just 5
-    f 'c' = K Nothing f
-    f 'd' = K (Just 99) g
-    f c = Z Nothing
-
-    g :: Char -> F Char Int
-    g 's' = Z $ Just 22
-    g 't' = K Nothing f
-    g c = Z Nothing
-
 buildCommands :: Map.Map [Mod Char] Command -> F (Mod Char) Command
 buildCommands = K Nothing . f
   where

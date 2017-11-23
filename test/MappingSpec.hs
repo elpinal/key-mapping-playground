@@ -57,3 +57,18 @@ spec = do
 
       execFromNormal [NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] switchNormIns) `shouldBe` (Just (Just Insert), [])
       execFromInsert [NoMod 'a'] (buildCommands $ Map.singleton [NoMod 'a'] switchNormIns) `shouldBe` (Just (Just Normal), [])
+
+exampleF :: F Char Int
+exampleF = K Nothing f
+  where
+    f :: Char -> F Char Int
+    f 'a' = Z $ Just 3
+    f 'b' = Z $ Just 5
+    f 'c' = K Nothing f
+    f 'd' = K (Just 99) g
+    f c = Z Nothing
+
+    g :: Char -> F Char Int
+    g 's' = Z $ Just 22
+    g 't' = K Nothing f
+    g c = Z Nothing
