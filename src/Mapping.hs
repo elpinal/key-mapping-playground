@@ -153,6 +153,12 @@ data Env = Env
 
 type EnvTransformer = Env -> Env
 
+initialEnv :: Env
+initialEnv = Env
+  { transMap = Map.empty
+  , noreMap = Map.empty
+  }
+
 translate :: [Mod Char] -> [Mod Char] -> EnvTransformer
 translate s d e = e { transMap = Map.insert s d $ transMap e }
 
