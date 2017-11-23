@@ -147,13 +147,13 @@ executeAll xs = case execute xs of
   (Nothing, ys) -> ([], ys)
 
 data Env = Env
-  { transMap :: Map.Map (Mod Char) (Mod Char)
+  { transMap :: Map.Map [Mod Char] [Mod Char]
   , noreMap  :: Map.Map [Mod Char] Command
   }
 
 type EnvTransformer = Env -> Env
 
-translate :: Mod Char -> Mod Char -> EnvTransformer
+translate :: [Mod Char] -> [Mod Char] -> EnvTransformer
 translate s d e = e { transMap = Map.insert s d $ transMap e }
 
 seqCmd :: [Command] -> Command
