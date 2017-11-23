@@ -130,14 +130,13 @@ buildCommands = K Nothing . f
     f :: Map.Map [Mod Char] Command -> Mod Char -> F (Mod Char) Command
     f m mc =
       let
-        m' = Map.filterWithKey (\k a -> Just mc == k `atMay` 0) m
+        m' = Map.filterWithKey (\k a -> Just mc == headMay k) m
       in
         K (Map.lookup [mc] m') . f $ Map.mapKeys tail m'
 
-atMay :: [a] -> Int -> Maybe a
-atMay (x : xs) 0 = Just x
-atMay (x : xs) n = atMay xs $ n - 1
-atMay [] n = Nothing
+headMay :: [a] -> Maybe a
+headMay (x : xs) = Just x
+headMay [] = Nothing
 
 execute :: [Mod Char] -> Maybe (Command, [Mod Char])
 execute (x : xs) =
