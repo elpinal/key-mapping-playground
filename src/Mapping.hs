@@ -159,3 +159,6 @@ translate s d e = e { transMap = Map.insert s d $ transMap e }
 seqCmd :: [Command] -> Command
 seqCmd (c : cs) m = c m >>= seqCmd cs
 seqCmd [] m = return m
+
+noremap :: [Mod Char] -> [Mod Char] -> EnvTransformer
+noremap s d e = e { noreMap = Map.insert s (seqCmd . fst $ executeAll d) $ noreMap e }
